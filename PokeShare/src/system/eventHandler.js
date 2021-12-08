@@ -298,7 +298,6 @@ Admin window events
 
 
 ipcMain.on('openAdminWindow', function(){
-  console.log("NUOWAHNDIQHWIUDHWUIFDHWIUDFDHEUWIfhuijwdhfuiwehufiew");
   createWindowAdmin();
 })
 
@@ -379,52 +378,8 @@ ipcMain.on('dashboard:requestPosts', function(){
 
 
 
-
-
-
-
-/**
- * Reports
- */
-
-
-
-
-ipcMain.on('windowReports:allUserTasks', function(){
-  ejs.renderFile(path.join(__dirname, ".", "reportModel.ejs"), {
-    title: "All user tasks",
-    username: curUserName,
-    makeTable: true,
-    headers: ["TaskId", "UserId", "Name", "TimeStart", "TimeEnd", "IsFinished"],
-    content: WindowManager.getUserTasks().map(task => task.compactAsArray())
-  }, (err, html) => {
-    if(err) console.log(err);
-    else {
-      console.log(html);
-      pdf.create(html, {}).toFile("src/reports/test1.pdf", (err, res) => {
-        if(err) console.log(err);
-        else console.log(res);
-      });
-    }
-  })
-
-})
-
-
-
-
-
-
-
-
 /*
 
-OTHER STUFF:
-- Database integration
-
-FUNC REQS:
-- Login
-- Tabs
 
 //http://127.0.0.1:3000/ElectronProjects/PokeShare/src/ui/windowLogin/
 
