@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style type="text/css">
+
+      body {
+        /* background-color: grey; */
+        margin: 0;
+        padding: 0
+      }
+
+      .page-container {
+        margin: 10px;
+      }
+
+      .formContainer {
+        margin-top: 100px;
+        height: 296px;
+        margin-left: 150px;
+        width: 296px;
+        border: 2px solid black;
+        padding: 20px
+      }
+
+      .formContainer form {
+        border: 2px solid white;
+
+      }
+
+      label {
+        width: 250px;
+      }
+
+      input {
+        width: 250px;
+      }
+
+      .btnSignin {
+        float: right
+      }
+
+      #dashboardContainer{
+        margin-bottom: 50px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="page-container">
+      <h1>Dashboard window</h1>
+
+      <hr>
+
+
+      <hr>
+
+      <div id="dashboardContainer">
+        <!-- <canvas id="chart1"></canvas> -->
+      </div>
+
+    </div>
+
+    <script src="dashboardBuilder.js"></script>
+
+    <script type="text/javascript">
+      var PLACEHOLDER = 0;
+
+
+
+      onLoad()
+
+      function onLoad(){
+        var placeholder = 0;
+        window.ipcHandler.send('dashboard:requestPosts')
+      }
+
+      var allPosts = [];
+
+      window.ipcHandler.on('dashboard:posts', (e, data) => {
+        // console.log('reachedPosts')
+        // console.log(data)
+        // for(var i = 0; i < data.length; i++){
+        //   allPosts.push(data[i])
+        // }
+        // console.log(allPosts)
+        // var postsObj = {
+        //   type: 'allPosts',
+        //   allPosts: allPosts
+        // }
+
+
+        //console.log("AAAAAAAAA")
+        console.log(data)
+        console.log(data.posts)
+        console.log(data.userid)
+        console.log(e)
+        handlePosts(data.posts, data.userid, data.isAdmin)
+      })
+
+      // $("#btnLogin").click(function(){
+      //   var obj = {
+      //     username: $("#inputUsername").val(),
+      //     password: $("#inputPassword").val()
+      //   }
+      //   window.ipcHandler.send("windowLogin:requestLogin", obj);
+      // });
+
+
+
+    </script>
+  </body>
+</html>

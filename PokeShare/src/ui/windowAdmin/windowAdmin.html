@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style type="text/css">
+
+      body {
+        /* background-color: grey; */
+        margin: 0;
+        padding: 0
+      }
+
+      .page-container {
+        margin: 10px;
+      }
+
+      .formContainer {
+        margin-top: 100px;
+        height: 296px;
+        margin-left: 150px;
+        width: 296px;
+        border: 2px solid black;
+        padding: 20px
+      }
+
+      .formContainer form {
+        border: 2px solid white;
+
+      }
+
+      label {
+        width: 250px;
+      }
+
+      input {
+        width: 250px;
+      }
+
+      .btnSignin {
+        float: right
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="page-container">
+      <h1>Admin processes</h1>
+
+      <hr>
+
+      <button class="btn btn-danger" id="btnAuditing">Auditing</button>
+      <button class="btn btn-danger" id="btnErrorLog">Error Log</button>
+
+      <hr>
+
+      <div class="audit-container" hidden>
+        <table id="tableAudit" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Table</th>
+              <th>Query</th>
+              <th>Date</th>
+              <th>New Value</th>
+              <th>Old Value</th>
+              <th>Logged user</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="auditRow1">
+              <td class="auditType">UPDATE</td>
+              <td class="auditTable">useracc</td>
+              <td class="auditQuery">hsdhewihdsjhwife</td>
+              <td class="auditDate">15/05/2021</td>
+              <td class="auditNew">Sad</td>
+              <td class="auditOld">Happy</td>
+              <td class="auditUser">1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="errlog-container" hidden>
+        <table id="tableErrLog" class="table table-striped">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Date</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="errlogUser">1</td>
+              <td class="errlogDate">10/09/2021</td>
+              <td class="errlogError">Bananas were too pink</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <script type="text/javascript">
+      var PLACEHOLDER = 0;
+
+      $("#btnAuditing").click(function(){
+        // console.log("btnAuditing");
+        window.ipcHandler.send('windowAdmin:requestAudits')
+        $(".audit-container").removeAttr("hidden");
+        $(".errlog-container").attr("hidden", "true");
+      });
+
+      $("#btnErrorLog").click(function(){
+        // console.log("btnErrorLog");
+        window.ipcHandler.send('windowAdmin:requestErrLog')
+        $(".audit-container").attr("hidden", "true");
+        $(".errlog-container").removeAttr("hidden");
+      });
+
+      window.ipcHandler.on('windowAdmin:auditsSuccess', (e, data) => {
+        console.log("Audits success!")
+        var arr = []
+        for(i in data.auditArray){
+          var x = data.auditArray[i]
+          arr.push([x.type, x.table, x.query, x.date, x.new, x.old, x.username])
+        }
+        window.ipcHandler.send('windowAdmin:buildReport', { table: arr, headers: ["type", "table", "query", "date", "new", "old", "username"], title: "Audit report"})
+        buildAuditTable(data.auditArray);
+      })
+
+      window.ipcHandler.on('windowAdmin:errlogSuccess', (e, data) => {
+        console.log("ErrLog success!")
+        var arr = []
+        for(i in data.errlogArray){
+          var x = data.errlogArray[i]
+          arr.push([x.username, x.date, x.err])
+        }
+        window.ipcHandler.send('windowAdmin:buildReport', { table: arr, headers: ["User", "Date", "Errors"] , title: "Error log report"})
+        buildErrLogTable(data.errlogArray)
+      })
+
+      var numRowsErrLog = 1;
+      function makeErrLogRow(errLogObj){
+        numRowsErrLog++;
+        var row = "<tr id=\"errlogRow"+numRowsErrLog+"\">";
+        row += "<td class=\"errlogUser\">";
+        row += errLogObj.username;
+        row += "</td><td class=\"errlogDate\">";
+        row += errLogObj.date;
+        row += "</td><td class=\"errlogError\">";
+        row += errLogObj.err;
+        row += "</td>";
+        row += "</tr>";
+        return row;
+      }
+
+      var numRowsAudit = 1;
+      function makeAuditRow(auditObj){
+        numRowsAudit++;
+        var row = "<tr id=\"auditRow"+numRowsAudit+"\">";
+        row += "<td class=\"auditType\">";
+        row += auditObj.type;
+        row += "</td><td class=\"auditTable\">";
+        row += auditObj.table;
+        row += "</td><td class=\"auditQuery\">";
+        row += auditObj.query;
+        row += "</td><td class=\"auditDate\">";
+        row += auditObj.date;
+        row += "</td><td class=\"auditNew\">";
+        row += auditObj.new;
+        row += "</td><td class=\"auditOld\">";
+        row += auditObj.old;
+        row += "</td><td class=\"auditUser\">";
+        row += auditObj.username;
+        row += "</td>";
+        row += "</tr>";
+        return row;
+      }
+
+      const emptyAuditTable = "<thead><tr><th>Type</th><th>Table</th><th>Query</th><th>Date</th><th>New Value</th><th>Old Value</th><th>Logged user</th></tr></thead><tbody>";
+      const emptyErrLogTable = "<thead><tr><th>User</th><th>Date</th><th>Error</th></tr></thead><tbody>";
+      const finishEmptyTable = "</tbody>"
+
+
+
+      function buildAuditTable(auditArray){
+        numRowsAudit = 0;
+        var newAuditTable = emptyAuditTable;
+        for(var i = 0; i < auditArray.length; i++){
+          newAuditTable += makeAuditRow(auditArray[i]);
+        }
+        newAuditTable += finishEmptyTable;
+        console.log(newAuditTable)
+        $("#tableAudit").html(newAuditTable);
+      }
+
+
+      function buildErrLogTable(errlogArray){
+        numRowsErrLog = 0;
+        var newErrLogTable = emptyErrLogTable;
+        for(var i = 0; i < errlogArray.length; i++){
+          newErrLogTable += makeErrLogRow(errlogArray[i]);
+        }
+        newErrLogTable += finishEmptyTable;
+        console.log(newErrLogTable)
+        $("#tableErrLog").html(newErrLogTable);
+      }
+
+      // buildErrLogTable([
+      //   {
+      //     username: "John",
+      //     date: "10/08/2021",
+      //     err: "wdhfihuwehfiwndfiuweh"
+      //   },
+      //   {
+      //     username: "Joshua",
+      //     date: "10/08/2022",
+      //     err: "fnweiufhjiehgieutr"
+      //   },
+      //   {
+      //     username: "Jonathan",
+      //     date: "10/08/2023",
+      //     err: "koierjgoifdjoir"
+      //   }
+      // ]);
+
+      // logid, type, table, query, date, novo valor, valor velho, usuário logado
+
+      onLoad()
+
+      function onLoad(){
+        var placeholder = 0;
+
+      }
+
+      // $("#btnLogin").click(function(){
+      //   var obj = {
+      //     username: $("#inputUsername").val(),
+      //     password: $("#inputPassword").val()
+      //   }
+      //   window.ipcHandler.send("windowLogin:requestLogin", obj);
+      // });
+
+
+
+    </script>
+  </body>
+</html>

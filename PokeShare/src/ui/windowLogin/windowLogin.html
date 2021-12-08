@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style type="text/css">
+
+      body {
+        /* background-color: grey; */
+        margin: 0;
+        padding: 0
+      }
+
+      .formContainer {
+        margin-top: 100px;
+        height: 296px;
+        margin-left: 150px;
+        width: 296px;
+        border: 2px solid black;
+        padding: 20px
+      }
+
+      .formContainer form {
+        border: 2px solid white;
+
+      }
+
+      label {
+        width: 250px;
+      }
+
+      input {
+        width: 250px;
+      }
+
+      .btnSignin {
+        float: right
+      }
+
+    </style>
+  </head>
+  <body>
+    <div>
+      <form class="formContainer">
+        <div class="form-group">
+          <label for="username">Username or Email</label>
+          <input class="form-control" type="text" name="username" id="inputUsername" placeholder="">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input class="form-control" type="password" name="password" id="inputPassword">
+        </div>
+        <div class="form-group" hidden>
+          <label for="email">Email</label>
+          <input class="form-control" type="email" name="email" id="inputEmail">
+        </div>
+        <div class="form-group">
+          <button id="btnLogin" class="btn btn-danger btnLogin" type="sumbit" name="login">Log in</button>
+          <button class="btn btn-danger btnSignin" type="sumbit" name="sign in">Sign in</button>
+        </div>
+      </form>
+    </div>
+
+    <script type="text/javascript">
+      var PLACEHOLDER = 0;
+
+      onLoad()
+
+      function onLoad(){
+        var loginWidth = 0.2
+        var loginHeight = 0.3
+        var loginMTop = Math.round(100*(1-loginHeight)/2)
+        var loginMLeft = Math.round(100*(1-loginWidth)/2)
+
+        // $(".formContainer").css("margin-top", loginMTop+"%")
+        // $(".formContainer").css("margin-left", loginMLeft+"%")
+        // $(".formContainer").css("width", (loginWidth*100)+"%")
+        // $(".formContainer").css("height", (loginHeight*100)+"%")
+      }
+
+      $("#btnLogin").click(function(){
+        var obj = {
+          username: $("#inputUsername").val(),
+          password: $("#inputPassword").val()
+        }
+        window.ipcHandler.send("windowLogin:requestLogin", obj);
+      });
+
+
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <style type="text/css">
+      body {
+        margin: 10px
+      }
+
+      .profileItem {
+        margin-top: 10px
+      }
+    </style>
+
+    <script>
+      function handleUserInfo(userinfo) {
+        $("#spanUsername").html(userinfo.username)
+        $("#spanName").html(userinfo.name)
+        $("#spanEmail").html(userinfo.email)
+        console.log($("#imgTest"))
+        // largeuint8ArrToString(userinfo.imgTest.img, function(strr){
+        //   console.log(strr)
+        //   $("#imgTest").attr('src', 'data:image/png;base64,' + hexToBase64(strr))
+        // })
+      }
+      function hexToBase64(str) {
+        return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
+      }
+      function largeuint8ArrToString(uint8arr, callback) {
+        var bb = new Blob([uint8arr]);
+        var f = new FileReader();
+        f.onload = function(e) {
+          callback(e.target.result);
+        };
+
+        f.readAsText(bb);
+      }
+      function init() {
+        window.parent.getUserInfo();
+        return true;
+      }
+    </script>
+  </head>
+  <body onload="init();">
+    <h1>Profile</h1>
+    <div class="container profileContainer">
+      <div class="profileItem form-control">
+        <span><b>Username:</b> <span id="spanUsername"></span></span>
+      </div>
+      <div class="profileItem form-control">
+        <span><b>Name:</b> <span id="spanName"></span></span>
+      </div>
+      <div class="profileItem form-control">
+        <span><b>Email:</b> <span id="spanEmail"></span></span>
+      </div>
+    </div>
+    <!-- <img id="imgTest" src="./testImg.png" alt=""> -->
+
+    <script>
+      var ph = 0;
+      // function ipcSend(msg, data){
+      //   ipcHandler.send(msg, data);
+      // }
+      // function ipcOn(msg, func){
+      //   ipcHandler.on(msg, func)
+      // }
+    </script>
+  </body>
+</html>

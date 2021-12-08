@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <style type="text/css">
+      body {
+        margin: 10px;
+      }
+
+      .post-container {
+        width: 70%;
+        height: 300px;
+        margin: 20px;
+        /* margin-left: 20px; */
+        border: 2px solid black;
+        border-radius: 5%;
+      }
+
+      .post-info-container {
+        width: 50%;
+        height: 80%;
+        float: left;
+        /* border: 3px solid black; */
+      }
+
+      .post-image-container {
+        width: 50%;
+        height: 100%;
+        float: left;
+        /* border: 3px solid red; */
+      }
+
+      .post-footer-container {
+        height: 100%;
+        float: none;
+      }
+
+      .post-image {
+        margin-top: 2%;
+        margin-right: 10px;
+        height: 90%;
+        border: 2px solid black;
+        border-radius: 10%;
+        background: black;
+        overflow: scroll;
+      }
+
+      .post-image img {
+        height: 200%;
+      }
+
+      .poster-account {
+        width: 200px;
+        height: 54px;
+        margin-left: 20px;
+        margin-top: 20px;
+        /* border: 2px solid black;
+        border-radius: 15%; */
+      }
+
+      .account-image {
+        /* margin: 5px 0px 0px 5px; */
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        border-radius: 50%;
+        float: left;
+        /* margin-top: 0px; */
+      }
+
+      .account-info {
+        margin-left: 57px;
+        margin-top: 0px;
+      }
+
+      .account-name {
+        font-weight: bold;
+        font-size: 20px;
+        margin: 0;
+      }
+
+      .account-tag {
+        margin: 0;
+        font-size: 14px;
+        font-weight: lighter;
+      }
+
+      .post-msg {
+        margin-left: 50px;
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        font-weight: normal;
+      }
+
+    </style>
+    <script>
+      // var ipcHandler = null;
+      // function handleIpcHandler(ipcHandlerTemp){
+      //   ipcHandler = ipcHandlerTemp;
+      //   console.log("AAAAAA")
+      //   console.log(ipcHandlerTemp)
+      //   console.log(ipcHandler)
+      // }
+      function init() {
+        // window.parent.getIpcHandler();
+        return true;
+      }
+    </script>
+  </head>
+  <body onload="init();">
+    <h1>Home</h1>
+
+    <!-- <image id="imgTest" style="height: 100px; width: 100px"></image> -->
+
+    <div id="feedContainer">
+      <div id="test1"></div>
+      <div class="post-container">
+        <div class="post-info-container">
+          <div class="poster-account">
+            <div class="account-image"></div>
+            <div class="account-info">
+              <div class="account-name">Jonas</div>
+              <div class="account-tag">@imthejonasman</div>
+            </div>
+          </div>
+          <div class="post-msg">Testtestttesttesttset</div>
+        </div>
+        <div class="post-image-container">
+          <div class="post-image">
+            <img class="" src="../../images/charizardCard.jpg" alt="">
+          </div>
+        </div>
+        <div class="post-footer-container"></div>
+      </div>
+    </div>
+
+    <script src="tabHomeScript.js"></script>
+
+
+    <script type="text/javascript">
+
+      function hexToBase64(str) {
+        return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
+      }
+
+      var eventHandlers = {
+
+      }
+
+      var allPosts = []
+
+      window.onmessage = function(e) {
+        // console.log("5555555555555555")
+        // console.log(e.data)
+        if(e.data.type == 'trigger'){
+          let tempFunc = eventHandlers[e.data.msg]
+          tempFunc(e.data.e, e.data.data)
+        } else if(e.data.type == 'allPosts'){
+          for(var i = 0; i < e.data.allPosts.length; i++){
+            allPosts.push(e.data.allPosts[i])
+          }
+          console.log("AllPosts recieved")
+          console.log(allPosts)
+          setVisualPosts()
+        }
+      };
+
+      function setVisualPosts(){
+        for(var i = 0; i < allPosts.length; i++){
+          createNewPost({
+            containerid: i+2,
+            username: allPosts[i].username,
+            usertag: allPosts[i].usertag,
+            imgtype: 'web', //instead of 'local'
+            imgpath: allPosts[i].pokemonApiData.sprite_shiny, //"charizard",
+            message: allPosts[i].description
+          });
+        }
+      }
+
+
+      function ipcSend(msg, data){
+        window.parent.postMessage({
+          type: 'send',
+          msg: msg,
+          data: data
+        }, '*');
+      }
+      function ipcOn(msg, func){
+        window.parent.postMessage({
+          type: 'on',
+          msg: msg
+        }, '*');
+        eventHandlers[msg] = function(e, data){
+          console.log("Received")
+          func(e, data)
+        }
+        // console.log("4444444444444")
+        // console.log(eventHandlers)
+      }
+      ipcSendSetup(ipcSend)
+      ipcOnSetup(ipcOn)
+
+
+      window.parent.postMessage({
+        type: 'send',
+        msg: 'test2',
+        data: {a:4,b:5}
+      }, '*');
+
+
+      //var img = $("#imgTest")[0]
+      //img.src = 'data:image/jpeg;base64,' + btoa('10110011001100110011001101001100110011001011001100110011001100110')
+
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <style type="text/css">
+      :root {
+        --color0: #C4DFE5;
+        --color1: #8fd6e1;
+        --color2: #1597bb;
+        --color3: #150e56;
+        --color4: #7b113a;
+      }
+
+      body {
+        margin: 10px;
+      }
+
+      .header hr {
+        border-width: 3px;
+        border-color: #150e56;
+      }
+
+      .page-container {
+        padding: 10px 30px;
+        color: #150e56;
+      }
+
+      form {
+        margin-top: 10px;
+      }
+
+      #formPoke {
+        border: 1px solid black;
+        border-radius: 3%;
+        margin-bottom: 25px;
+        padding: 25px;
+        padding-top: 15px;
+      }
+
+      /* .form-input-container {
+        margin-top: 5px;
+      } */
+
+      #alertFail {
+        margin-top: 5px;
+        color: var(--color4);
+      }
+
+      #formMsg input {
+        height: 100%
+      }
+
+    </style>
+    <script>
+      var userinfo = {}
+      function handleUserInfo(info) {
+        userinfo = info
+        console.log(userinfo)
+      }
+
+      function init() {
+        window.parent.getUserInfo();
+        return true;
+      }
+    </script>
+  </head>
+  <body onload="init();">
+    <h1>New Post</h1>
+
+    <!-- <image id="imgTest" style="height: 100px; width: 100px"></image> -->
+
+    <div class="page-container">
+      <div class="form-container">
+        <form id="formTaskEditor" class="row g-3">
+          <!-- <div class="form-input-container col-md-12">
+            <div id="formTitle" class="mb-3">
+              <label for="inputTitle" class="form-label">Title</label>
+              <input type="text" name="inputTitle" id="inputTitle" class="form-control">
+            </div>
+          </div> -->
+          <div id="formSplitContainer">
+
+          </div>
+          <div id="formPoke" class="form-input-container col-md-6">
+            <label class="form-label">Pokemon ID</label>
+            <div class="input-group col">
+              <input type="text" class="form-control" id="inputPokeId">
+            </div>
+            <label class="form-label">Pokemon Name</label>
+            <div class="input-group col">
+              <input type="text" class="form-control" id="inputPokeName">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="inputIsHolo">
+              <label class="form-check-label" for="inputIsHolo">Holographic</label>
+            </div>
+          </div>
+          <div id="formMsg" class="form-input-container col-md-6">
+            <label for="inputMessage" class="form-label">Message</label>
+            <input type="text" name="inputMessage" id="inputMessage" class="form-control">
+            <div  class="mb-3"></div>
+          </div>
+          <div class="form-input-container col-md-12">
+            <button id="btnSubmitPost" type="submit" class="btn btn-danger btn-daytracker">Post</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+
+    <script type="text/javascript">
+      var ph = 0;
+      $("#formMsg").height($("#formPoke").height())
+
+      $("#btnSubmitPost").click(function(){
+        const obj = {
+          userid: userinfo.userid,
+          // title: $("#inputTitle").val(),
+          pokemonId: $("#inputPokeId").val(),
+          pokemonName: $("#inputPokeName").val(),
+          isHolo: $("#inputIsHolo").is(":checked"),
+          message: $("#inputMessage").val()
+        };
+        console.log(obj)
+        ipcSend('tabNewPost:createPost', obj);
+      });
+
+      var eventHandlers = {
+
+      } 
+
+      window.onmessage = function(e) {
+        // console.log("5555555555555555")
+        // console.log(e.data)
+        if(e.data.type == 'trigger'){
+          let tempFunc = eventHandlers[e.data.msg]
+          tempFunc(e.data.e, e.data.data)
+        }
+      };
+
+
+      function ipcSend(msg, data){
+        window.parent.postMessage({
+          type: 'send',
+          msg: msg,
+          data: data
+        }, '*');
+      }
+      function ipcOn(msg, func){
+        window.parent.postMessage({
+          type: 'on',
+          msg: msg
+        }, '*');
+        eventHandlers[msg] = function(e, data){
+          console.log("Received")
+          func(e, data)
+        }
+      }
+    </script>
+  </body>
+</html>
