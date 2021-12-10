@@ -34,7 +34,8 @@
       var userinfo = {
         username: 'hey',
         name: 'john',
-        email: 'johnny@gmail.com'
+        email: 'johnny@gmail.com',
+        following: []
       }
       function getUserInfo() {
         var frame = window.frames['iframe'];
@@ -103,10 +104,12 @@
       $("#tabProfile").click(function(){
         $("#iframe").attr("src","./tabs/tabProfile.html")
         currentFrame = "Profile";
+        window.ipcHandler.send('requestAllPosts')
       })
       $("#tabFollowing").click(function(){
         $("#iframe").attr("src","./tabs/tabFollowing.html")
         currentFrame = "Follow";
+        window.ipcHandler.send('requestAllPosts')
       })
       $("#tabNewPost").click(function(){
         $("#iframe").attr("src","./tabs/tabNewPost.html")
@@ -129,6 +132,7 @@
           username: data.username,
           name: data.name,
           email: data.email,
+          following: data.following,
           isAdmin: (data.role == 'admin') ? true : false
         }
         console.log("AAAAAAAA");
@@ -147,6 +151,7 @@
       window.ipcHandler.on('getAllPosts:success', (e, data) => {
         console.log('reachedPosts')
         console.log(data)
+        allPosts = [];
         for(var i = 0; i < data.length; i++){
           allPosts.push(data[i])
         }

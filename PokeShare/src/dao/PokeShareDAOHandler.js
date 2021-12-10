@@ -67,6 +67,24 @@ class PokeShareDAOHandler {
     }
   }
 
+  async getFollowing(userid, callbackSuccess, callbackFail = function(){}){
+    try{
+      let dao = new PokeShareDAO();
+      await dao.connect();
+      const results = await dao.query(`SELECT followed FROM following WHERE follower = ${userid}`);
+      let success = results.rows;
+      if(success.length > 0){
+        callbackSuccess(success);
+      } else callbackFail();
+      await dao.end();
+      dao = null;
+    }
+    catch(err){
+      throw err;
+    }
+
+  }
+
   async getimgtest(callbackSuccess, callbackFail = function(){}){
     try{
       let dao = new PokeShareDAO();
@@ -138,7 +156,6 @@ class PokeShareDAOHandler {
       callbackFail()
       console.log(err);
     }
-
   }
 
   async createPost(data, callbackSuccess, callbackFail = function(){}){
