@@ -138,6 +138,28 @@ class PokeShareDAOHandler {
       callbackFail()
       console.log(err);
     }
+    
+
+  }
+  async getAllComments(callbackSuccess, callbackFail = function(){}){
+    try{
+      let dao = new PokeShareDAO();
+      await dao.connect();
+      // const posts = await dao.query(`SELECT postid, userid, description, to_char(date, 'DD/MM/YYYY HH24:mi:ss') AS date, likes, pokeid, isholo FROM posts`);
+      // const posts = await dao.query(`SELECT p.postid, u.userid, u.username AS usertag, u.name AS username, p.description, to_char(p.date, 'DD/MM/YYYY HH24:mi:ss') AS date, p.likes, p.pokeid, p.isholo FROM posts p, useracc u WHERE p.userid = u.userid`);
+      const posts = await dao.query(`SELECT commenttid, userid,postid,message, to_char(date, 'DD/MM/YYYY HH24:mi:ss') AS date,FROM comments`);
+      console.log(posts.rows);
+      console.log(posts.rowCount);
+      if(posts.rowCount > 0) callbackSuccess(posts.rows);
+      else callbackFail();
+      await dao.end();
+      dao = null;
+    }
+    catch(err){
+      callbackFail()
+      console.log(err);
+    }
+    
 
   }
 
