@@ -78,7 +78,7 @@ async function sendAllPostsWithApiData(data, isDashboardWindow = false){
   }
 }
 
-ipcMain.on('requestAllPosts', (e, data) => {
+ipcMain.on('requestAllPosts', (e, Xdata) => {
   daoHandler.getAllPosts((data) => {
     console.log('getAllPosts:success');
     console.log(data);
@@ -218,19 +218,29 @@ ipcMain.on('windowLogin:requestLogin', (e, data) => {
     loggedUser.isAdmin = (user.role === 'admin')
     console.log("======================================");
     console.log(loggedUser.id);
-    testPokeApi()
-    mainWindow.close()
-    createWindow('main')
-    // console.log("aaaaaaa");
-    mainWindow.on('ready-to-show', function(){
-      // console.log("bbbbbbb");
-      imgTestUser = user
-      imgTestUser.imgTest = imgTestBinString
-      // console.log(imgTestUser);
-      console.log("AAAAAAAA");
-      console.log(user);
-      mainWindow.webContents.send('user', user)
+
+    daoHandler.getFollowing(user.userid, (following) => {
+
+      user.following = following
+
+      console.log("FFFFFFFFFFFFFFFFFFFFFFFFF")
+      console.log(following)
+
+      testPokeApi()
+      mainWindow.close()
+      createWindow('main')
+      // console.log("aaaaaaa");
+      mainWindow.on('ready-to-show', function(){
+        // console.log("bbbbbbb");
+        imgTestUser = user
+        imgTestUser.imgTest = imgTestBinString
+        // console.log(imgTestUser);
+        console.log("AAAAAAAA");
+        console.log(user);
+        mainWindow.webContents.send('user', user)
+      })
     })
+
   }, () => {
     console.log("Error during login")
   });
