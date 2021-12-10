@@ -162,6 +162,36 @@ class PokeShareDAOHandler {
     
 
   }
+  async createComment(data, callbackSuccess, callbackFail = function(){}){
+    try{
+      let dao = new PokeShareDAO();
+      await dao.connect();
+      let getNewPostId = true;
+
+      if(getNewPostId){
+        //caso precise gerar uma nova tarefa id, gera uma id disponível
+        const queryMaxId = await dao.query("SELECT MAX(commentid) FROM comments");
+        console.log(queryMaxId);
+        const newPostId = queryMaxId.rows[0].max + 1;
+        data.commentid = newPostId
+        console.log("commentId");
+        console.log(data.commentid);
+      }
+      // const queryPostExists = await dao.query(`SELECT postid FROM posts WHERE postid=${data.postid}`);
+      console.log(data);
+      const results = await dao.query(`INSERT INTO comments VALUES(${data.commentid}, ${data.userid}, '${data.message}', '30/01/2022 00:00:00', 0')`);
+      console.log("results");
+      console.log(results);
+      if(results && results.rowCount > 0) callbackSuccess();
+      else callbackFail();
+      await dao.end();
+      dao = null;
+    }
+    catch(err){
+      callbackFail();
+      console.log(err);
+    }
+  }
 
   async createPost(data, callbackSuccess, callbackFail = function(){}){
     try{
